@@ -19,3 +19,9 @@ func GenRandEVMAddr() string {
 	random.Read(addrBytes)
 	return "0x" + hex.EncodeToString(addrBytes)
 }
+
+func GenRandEVMHash() string {
+	addrBytes := make([]byte, 32)
+	random.Read(addrBytes)
+	return "0x" + hex.EncodeToString(addrBytes)
+}
