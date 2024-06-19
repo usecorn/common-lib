@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/cornbase/common-lib/pkg/testutils"
+	"github.com/cornbase/common-lib/testutils"
 )
 
 func Test_GetValidEthAddr(t *testing.T) {
