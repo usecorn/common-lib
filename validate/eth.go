@@ -14,6 +14,7 @@ const (
 
 var (
 	ethAddrExp        = regexp.MustCompile(EthAddrRegex)
+	btcAddrExp        = regexp.MustCompile(BtcAddrRegex)
 	ErrInvalidEthAddr = errors.New("invalid ethereum address")
 )
 
@@ -29,4 +30,11 @@ func GetValidEthAddr(addr string) (string, error) {
 		return "", ErrInvalidEthAddr
 	}
 	return out, nil
+}
+
+func GetValidBtcAddr(addr string) (string, error) {
+	if !btcAddrExp.MatchString(addr) {
+		return "", errors.New("invalid bitcoin address")
+	}
+	return addr, nil
 }
