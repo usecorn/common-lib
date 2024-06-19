@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"sync/atomic"
 	"syscall"
 
@@ -87,4 +88,19 @@ func ListenWithGracefulShutdown(ctx context.Context, log logrus.Ext1FieldLogger,
 	<-ctx.Done()
 	return nil
 
+}
+
+func GetInt64Param(c *gin.Context, key string, maxVal, defaultVal int64) (int64, error) {
+	val := c.Param(key)
+	if len(val) == 0 {
+		return defaultVal, nil
+	}
+	out, err := strconv.ParseInt(val, 10, 64)
+	if err != nil {
+		return 0, errors.Wrapf(err, "failed to parse int64 param \"%s\" value \"%s\"", key, val)
+	}
+	if maxVal != -1 && out > maxVal {
+		return 0, errors.Errorf("param \"%s\" too large, must be less than %d", key, maxVal)
+	}
+	return out, nil
 }
