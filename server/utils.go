@@ -60,6 +60,7 @@ func (h *HealthCheck) Health(c *gin.Context) {
 func ListenWithGracefulShutdown(ctx context.Context, log logrus.Ext1FieldLogger, router *gin.Engine, conf ServerConfig) error {
 	// Wrap the gin router in http.Server so we can call Shutdown
 	hc := NewHealthCheck()
+	router.GET(conf.HealthCheckPath, hc.Health)
 	srv := &http.Server{
 		Addr:              conf.Listen,
 		Handler:           router.Handler(),
