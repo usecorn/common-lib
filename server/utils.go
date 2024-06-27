@@ -105,3 +105,12 @@ func GetInt64Param(c *gin.Context, key string, maxVal, defaultVal int64) (int64,
 	}
 	return out, nil
 }
+
+func SafeMetricsInc(log logrus.Ext1FieldLogger, metric *ginmetrics.Metric, labelValues []string) {
+	if metric == nil {
+		return
+	}
+	if err := metric.Inc(labelValues); err != nil {
+		log.WithError(err).Error("failed to increment metric")
+	}
+}
