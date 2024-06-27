@@ -111,6 +111,8 @@ func SafeMetricsInc(log logrus.Ext1FieldLogger, metric *ginmetrics.Metric, label
 		return
 	}
 	if err := metric.Inc(labelValues); err != nil {
-		log.WithError(err).Error("failed to increment metric")
+		if log != nil {
+			log.WithError(err).Error("failed to increment metric")
+		}
 	}
 }
