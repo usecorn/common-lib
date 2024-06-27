@@ -15,6 +15,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// SetupMetrics sets up a ginmetrics.Monitor with the given parameters, will expose the metrics on the given path and listen on the given address.
 func SetupMetrics(otherRouter *gin.Engine, path, listen string, durations []float64) *ginmetrics.Monitor {
 	router := gin.New()
 
@@ -57,6 +58,8 @@ func (h *HealthCheck) Health(c *gin.Context) {
 	c.JSON(http.StatusInternalServerError, gin.H{"status": "unhealthy"})
 }
 
+// ListenWithGracefulShutdown listens on the given address with the given gin router, and will shutdown gracefully when a SIGINT or SIGTERM signal is received.
+// Also setups up a health check endpoint on the given path, which will be unhealthy when the server is shutting down.
 func ListenWithGracefulShutdown(ctx context.Context, log logrus.Ext1FieldLogger, router *gin.Engine, conf ServerConfig) error {
 	// Wrap the gin router in http.Server so we can call Shutdown
 	hc := NewHealthCheck()
@@ -91,6 +94,7 @@ func ListenWithGracefulShutdown(ctx context.Context, log logrus.Ext1FieldLogger,
 
 }
 
+// GetInt64Param gets the int64 parameter from the gin context, and returns the value or the default value if the parameter is not set.
 func GetInt64Param(c *gin.Context, key string, maxVal, defaultVal int64) (int64, error) {
 	val := c.Param(key)
 	if len(val) == 0 {
@@ -106,6 +110,8 @@ func GetInt64Param(c *gin.Context, key string, maxVal, defaultVal int64) (int64,
 	return out, nil
 }
 
+// SafeMetricsInc increments the given metric with the given label values, and logs an error if the increment fails.
+// All parameters can safely be nil, if metric is nil, this function does nothing.
 func SafeMetricsInc(log logrus.Ext1FieldLogger, metric *ginmetrics.Metric, labelValues []string) {
 	if metric == nil {
 		return
@@ -113,6 +119,18 @@ func SafeMetricsInc(log logrus.Ext1FieldLogger, metric *ginmetrics.Metric, label
 	if err := metric.Inc(labelValues); err != nil {
 		if log != nil {
 			log.WithError(err).Error("failed to increment metric")
+		}
+	}
+}
+
+// SafeMetricsGauge sets the given metric to the given value with the given label values, and logs an error if the set fails.
+func SafeMetricsGauge(log logrus.Ext1FieldLogger, metric *ginmetrics.Metric, labelValues []string, value float64) {
+	if metric == nil {
+		return
+	}
+	if err := metric.SetGaugeValue(labelValues, value); err != nil {
+		if log != nil {
+			log.WithError(err).Error("failed to set gauge metric")
 		}
 	}
 }

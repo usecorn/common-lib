@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+// GenRandGalxeID generates a random Galxe ID
 func GenRandGalxeID() string {
 
 	idBytes := make([]byte, 16)

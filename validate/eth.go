@@ -18,6 +18,8 @@ var (
 	ErrInvalidEthAddr = errors.New("invalid ethereum address")
 )
 
+// GetValidEthAddr returns a valid Ethereum address or an error if the address is invalid.
+// will add the 0x prefix if it's missing, and lowercase the input.
 func GetValidEthAddr(addr string) (string, error) {
 	out := strings.ToLower(addr)
 	if len(out) == 40 {
@@ -32,6 +34,7 @@ func GetValidEthAddr(addr string) (string, error) {
 	return out, nil
 }
 
+// GetValidBtcAddr returns a valid Bitcoin address or an error if the address is invalid.
 func GetValidBtcAddr(addr string) (string, error) {
 	if !btcAddrExp.MatchString(addr) {
 		return "", errors.New("invalid bitcoin address")

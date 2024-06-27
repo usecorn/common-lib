@@ -52,7 +52,6 @@ func MustFloatToNumeric(f *big.Float) pgtype.Numeric {
 		panic(err)
 	}
 	return n
-
 }
 
 func RatToNumeric(r *big.Rat) (pgtype.Numeric, error) {

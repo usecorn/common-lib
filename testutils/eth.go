@@ -20,6 +20,7 @@ func GenRandEVMAddr() string {
 	return "0x" + hex.EncodeToString(addrBytes)
 }
 
+// GenRandEVMHash generates a random Ethereum hash
 func GenRandEVMHash() string {
 	addrBytes := make([]byte, 32)
 	random.Read(addrBytes)
