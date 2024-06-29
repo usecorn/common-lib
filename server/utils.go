@@ -123,6 +123,19 @@ func SafeMetricsInc(log logrus.Ext1FieldLogger, metric *ginmetrics.Metric, label
 	}
 }
 
+// SafeMetricsAdd increased the given metric by value with the given label values, and logs an error if the increase fails.
+// All parameters can safely be nil, if metric is nil, this function does nothing.
+func SafeMetricsAdd(log logrus.Ext1FieldLogger, metric *ginmetrics.Metric, labelValues []string, value float64) {
+	if metric == nil {
+		return
+	}
+	if err := metric.Add(labelValues, value); err != nil {
+		if log != nil {
+			log.WithError(err).Error("failed to increment metric")
+		}
+	}
+}
+
 // SafeMetricsGauge sets the given metric to the given value with the given label values, and logs an error if the set fails.
 func SafeMetricsGauge(log logrus.Ext1FieldLogger, metric *ginmetrics.Metric, labelValues []string, value float64) {
 	if metric == nil {
