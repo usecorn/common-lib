@@ -10,6 +10,7 @@ import (
 	"syscall"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/penglongli/gin-metrics/ginmetrics"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -106,6 +107,20 @@ func GetInt64Param(c *gin.Context, key string, maxVal, defaultVal int64) (int64,
 	}
 	if maxVal != -1 && out > maxVal {
 		return 0, errors.Errorf("param \"%s\" too large, must be less than %d", key, maxVal)
+	}
+	return out, nil
+}
+
+// GetUUIDParam gets the uuid parameter from the gin context Param call, and parses then returns the value
+// or an error if the parameter is not set or invalid.
+func GetUUIDParam(c *gin.Context, key string) (uuid.UUID, error) {
+	val := c.Param(key)
+	if len(val) == 0 {
+		return uuid.Nil, errors.Errorf("param \"%s\" is required", key)
+	}
+	out, err := uuid.Parse(val)
+	if err != nil {
+		return uuid.Nil, errors.Wrapf(err, "failed to parse uuid param \"%s\" value \"%s\"", key, val)
 	}
 	return out, nil
 }
