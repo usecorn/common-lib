@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 // ContextWithSignal sets up a signal listener, which will cancel the returned context when
@@ -20,4 +21,15 @@ func ContextWithSignal(ctx context.Context) context.Context {
 	}()
 	return ctx
 
+}
+
+// SleepContext sleeps for the given duration or until the context is cancelled.
+// If the context is cancelled, it returns the error from the context.
+func SleepContext(ctx context.Context, duration time.Duration) error {
+	select {
+	case <-time.After(duration):
+		return nil
+	case <-ctx.Done():
+		return ctx.Err()
+	}
 }
