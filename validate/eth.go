@@ -9,12 +9,10 @@ import (
 
 const (
 	EthAddrRegex = `^0x[0-9|a-f|A-F]{40}$`
-	BtcAddrRegex = `^(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,64}$`
 )
 
 var (
 	ethAddrExp        = regexp.MustCompile(EthAddrRegex)
-	btcAddrExp        = regexp.MustCompile(BtcAddrRegex)
 	ErrInvalidEthAddr = errors.New("invalid ethereum address")
 )
 
@@ -32,12 +30,4 @@ func GetValidEthAddr(addr string) (string, error) {
 		return "", ErrInvalidEthAddr
 	}
 	return out, nil
-}
-
-// GetValidBtcAddr returns a valid Bitcoin address or an error if the address is invalid.
-func GetValidBtcAddr(addr string) (string, error) {
-	if !btcAddrExp.MatchString(addr) {
-		return "", errors.New("invalid bitcoin address")
-	}
-	return addr, nil
 }
