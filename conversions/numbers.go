@@ -7,6 +7,9 @@ import (
 	"github.com/jackc/pgtype"
 )
 
+// SolidityIntSize is the size of a Solidity int in bits.
+const SolidityIntSize uint = 256
+
 func NumericToRat(n pgtype.Numeric) (*big.Rat, error) {
 	rat := big.NewRat(1, 1)
 	err := n.AssignTo(rat)
@@ -21,7 +24,9 @@ func NumericToFloat(n pgtype.Numeric) (*big.Float, error) {
 	if err != nil {
 		return nil, err
 	}
-	return big.NewFloat(0).SetRat(rat), nil
+	out := big.NewFloat(0)
+	out.SetPrec(SolidityIntSize) // the default precision is 53 bits, which is not enough to accurately handle 256-bit integers
+	return out.SetRat(rat), nil
 }
 
 func NumericToInt(n pgtype.Numeric) (*big.Int, error) {

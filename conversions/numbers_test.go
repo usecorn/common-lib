@@ -18,12 +18,25 @@ func Test_NumericToRat(t *testing.T) {
 }
 
 func Test_NumericToFloat(t *testing.T) {
-	n := pgtype.Numeric{}
-	err := n.Set("1.5")
-	require.NoError(t, err)
-	rat, err := NumericToFloat(n)
-	require.NoError(t, err)
-	require.EqualValues(t, big.NewFloat(1.5), rat)
+	t.Run("simple case", func(t *testing.T) {
+		n := pgtype.Numeric{}
+		err := n.Set("1.5")
+		require.NoError(t, err)
+		f, err := NumericToFloat(n)
+		require.NoError(t, err)
+		res, _ := f.Float64()
+		require.EqualValues(t, 1.5, res)
+	})
+	t.Run("larger numbers", func(t *testing.T) {
+		n := pgtype.Numeric{}
+		err := n.Set("105111000000000000000001")
+		require.NoError(t, err)
+		f, err := NumericToFloat(n)
+		require.NoError(t, err)
+		require.True(t, f.IsInt())
+		i, _ := f.Int(nil)
+		require.EqualValues(t, "105111000000000000000001", i.String())
+	})
 }
 
 func Test_NumericToInt(t *testing.T) {
