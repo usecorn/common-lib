@@ -9,7 +9,7 @@ import (
 
 const (
 	EthAddrRegex = `^0x[0-9|a-f|A-F]{40}$`
-	BtcAddrRegex = `^(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,59}$`
+	BtcAddrRegex = `^(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,64}$`
 )
 
 var (
