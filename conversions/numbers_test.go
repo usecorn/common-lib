@@ -27,13 +27,23 @@ func Test_NumericToFloat(t *testing.T) {
 }
 
 func Test_NumericToInt(t *testing.T) {
-	n := pgtype.Numeric{}
-	err := n.Set("1")
-	require.NoError(t, err)
-	i, err := NumericToInt(n)
-	require.NoError(t, err)
-	require.EqualValues(t, big.NewInt(1), i)
+	t.Run("basic test", func(t *testing.T) {
+		n := pgtype.Numeric{}
+		err := n.Set("1")
+		require.NoError(t, err)
+		i, err := NumericToInt(n)
+		require.NoError(t, err)
+		require.EqualValues(t, big.NewInt(1), i)
+	})
 
+	t.Run("large number test", func(t *testing.T) {
+		n := pgtype.Numeric{}
+		err := n.Set("703000000000000000000000")
+		require.NoError(t, err)
+		i, err := NumericToInt(n)
+		require.NoError(t, err)
+		require.Equal(t, "703000000000000000000000", i.String())
+	})
 }
 
 func Test_FloatToNumeric(t *testing.T) {

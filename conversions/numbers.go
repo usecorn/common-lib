@@ -1,6 +1,7 @@
 package conversions
 
 import (
+	"errors"
 	"math/big"
 
 	"github.com/jackc/pgtype"
@@ -24,12 +25,14 @@ func NumericToFloat(n pgtype.Numeric) (*big.Float, error) {
 }
 
 func NumericToInt(n pgtype.Numeric) (*big.Int, error) {
-	f, err := NumericToFloat(n)
+	rat, err := NumericToRat(n)
 	if err != nil {
 		return nil, err
 	}
-	out, _ := f.Int(nil)
-	return out, nil
+	if rat.Denom().Sign() == 0 {
+		return nil, errors.New("cannot convert infinite precision number to int")
+	}
+	return big.NewInt(0).Div(rat.Num(), rat.Denom()), nil
 }
 
 func MustNumericToInt(n pgtype.Numeric) *big.Int {
