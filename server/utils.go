@@ -95,9 +95,7 @@ func ListenWithGracefulShutdown(ctx context.Context, log logrus.Ext1FieldLogger,
 
 }
 
-// GetInt64Param gets the int64 parameter from the gin context, and returns the value or the default value if the parameter is not set.
-func GetInt64Param(c *gin.Context, key string, maxVal, defaultVal int64) (int64, error) {
-	val := c.Param(key)
+func getInt64(val, key string, maxVal, defaultVal int64) (int64, error) {
 	if len(val) == 0 {
 		return defaultVal, nil
 	}
@@ -109,6 +107,16 @@ func GetInt64Param(c *gin.Context, key string, maxVal, defaultVal int64) (int64,
 		return 0, errors.Errorf("param \"%s\" too large, must be less than %d", key, maxVal)
 	}
 	return out, nil
+}
+
+// GetInt64Param gets the int64 parameter from the gin context, and returns the value or the default value if the parameter is not set.
+func GetInt64Param(c *gin.Context, key string, maxVal, defaultVal int64) (int64, error) {
+	return getInt64(c.Param(key), key, maxVal, defaultVal)
+}
+
+// GetInt64Query gets the int64 query parameter from the gin context, and returns the value or the default value if the parameter is not set.
+func GetInt64Query(c *gin.Context, key string, maxVal, defaultVal int64) (int64, error) {
+	return getInt64(c.Query(key), key, maxVal, defaultVal)
 }
 
 // GetUUIDParam gets the uuid parameter from the gin context Param call, and parses then returns the value
