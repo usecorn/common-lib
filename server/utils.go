@@ -133,6 +133,32 @@ func GetUUIDParam(c *gin.Context, key string) (uuid.UUID, error) {
 	return out, nil
 }
 
+// GetPagenation takes the query parameters "page" and "pageSize" from the gin context,
+// and returns the values or an error if the parameters are invalid. Defaults page to 0, and pageSize to
+// defaultPageSize if not set.
+// Returns page, pageSize, error
+func GetPagenation(c *gin.Context, maxPageSize, defaultPageSize int64) (int64, int64, error) {
+	page, err := GetInt64Query(c, "page", -1, 0)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	if page < 0 {
+		return 0, 0, errors.New("page must be greater than or equal to 0")
+	}
+
+	pageSize, err := GetInt64Query(c, "pageSize", maxPageSize, defaultPageSize)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	if pageSize <= 0 {
+		return 0, 0, errors.New("pageSize must be greater than 0")
+	}
+
+	return page, pageSize, nil
+}
+
 // SafeMetricsInc increments the given metric with the given label values, and logs an error if the increment fails.
 // All parameters can safely be nil, if metric is nil, this function does nothing.
 func SafeMetricsInc(log logrus.Ext1FieldLogger, metric *ginmetrics.Metric, labelValues []string) {
