@@ -1,6 +1,7 @@
 package bitcoin
 
 import (
+	"encoding/base64"
 	"encoding/hex"
 
 	"github.com/btcsuite/btcd/btcec/v2/ecdsa"
@@ -55,4 +56,14 @@ func ParsePublicKey(pubKeyHex string) (*secp2561k1.PublicKey, error) {
 		pubKey = append([]byte{0x02}, pubKey...)
 	}
 	return secp2561k1.ParsePubKey(pubKey)
+}
+
+// ParseSignature is a convenience function to parse a signature from a hex or base64 string
+func ParseSignature(signature string) ([]byte, error) {
+	decodedSignature, err := hex.DecodeString(signature)
+	if err == nil {
+		return decodedSignature, nil
+	}
+	// likely base64
+	return base64.StdEncoding.DecodeString(signature)
 }
