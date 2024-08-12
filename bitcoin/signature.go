@@ -1,6 +1,8 @@
 package bitcoin
 
 import (
+	"encoding/hex"
+
 	"github.com/btcsuite/btcd/btcec/v2/ecdsa"
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
 	secp2561k1 "github.com/decred/dcrd/dcrec/secp256k1/v4"
@@ -38,5 +40,16 @@ func RecoverPublicKey(message string, signatureDecoded []byte) (*secp2561k1.Publ
 	}
 
 	return publicKey, nil
+}
 
+// ParsePublicKey parses a public key from a hex string
+func ParsePublicKey(pubKeyHex string) (*secp2561k1.PublicKey, error) {
+	pubKey, err := hex.DecodeString(pubKeyHex)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not decode public key")
+	}
+	if len(pubKey) == 32 { // X only public key, convert to compressed public key
+		pubKey = append([]byte{0x02}, pubKey...)
+	}
+	return secp2561k1.ParsePubKey(pubKey)
 }

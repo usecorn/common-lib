@@ -21,6 +21,14 @@ const MagicMessage = "\x18Bitcoin Signed Message:\n"
 // Taken from https://github.com/bitcoin/bips/blob/master/bip-0322.mediawiki#full
 const BIP322Tag = "BIP0322-signed-message"
 
+// SHA256 returns the SHA256 hash of the input data
+func SHA256(data []byte) (hash []byte) {
+	sha := sha256.New()
+	sha.Write(data[:])
+	hash = sha.Sum(nil)
+	return
+}
+
 // CreateMagicMessage builds a properly signed message.
 func CreateMagicMessage(message string) string {
 	buffer := bytes.Buffer{}
