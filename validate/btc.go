@@ -4,6 +4,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/cornbase/common-lib/bitcoin"
 	"github.com/pkg/errors"
 )
 
@@ -40,4 +41,16 @@ func GetValidBtcAddr(addr string) (string, error) {
 		return "", errors.New("invalid bitcoin address")
 	}
 	return addr, nil
+}
+
+// CheckValidSecp256k1PubKey checks if a given public key hex is a valid secp256k1 public key
+func CheckValidSecp256k1PubKey(pubKey string) error {
+	pk, err := bitcoin.ParsePublicKey(pubKey)
+	if err != nil {
+		return err
+	}
+	if !pk.IsOnCurve() {
+		return errors.New("invalid public key, not on secp256k1 curve")
+	}
+	return nil
 }

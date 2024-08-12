@@ -28,3 +28,12 @@ func Test_GetValidBtcAddr(t *testing.T) {
 	}
 
 }
+
+func Test_CheckValidSecp256k1PubKey(t *testing.T) {
+	err := CheckValidSecp256k1PubKey("87176beec39cbbd2f1999209894684e1620bc39ebc2a704add0edb23d0207d7e")
+	require.NoError(t, err)
+
+	err = CheckValidSecp256k1PubKey("87176ceec39cbbd2f1999209894684e1620bc39ebc2a704add0edb23d0207d7e")
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "not on the secp256k1 curve")
+}

@@ -44,9 +44,12 @@ func RecoverPublicKey(message string, signatureDecoded []byte) (*secp2561k1.Publ
 
 // ParsePublicKey parses a public key from a hex string
 func ParsePublicKey(pubKeyHex string) (*secp2561k1.PublicKey, error) {
+	if pubKeyHex[:2] == "0x" {
+		pubKeyHex = pubKeyHex[2:]
+	}
 	pubKey, err := hex.DecodeString(pubKeyHex)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not decode public key")
+		return nil, errors.Wrapf(err, "could not decode public key \"%s\"", pubKeyHex)
 	}
 	if len(pubKey) == 32 { // X only public key, convert to compressed public key
 		pubKey = append([]byte{0x02}, pubKey...)
