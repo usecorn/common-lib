@@ -20,6 +20,7 @@ func Test_GetValidBtcAddr(t *testing.T) {
 		"bc1pcejefkj9658nyslnr0qup6dzzt5a0nawd535uymrqlhaqvztvves84wdaf",
 		"bc1qeklep85ntjz4605drds6aww9u0qr46qzrv5xswd35uhjuj8ahfcqgf6hak",
 		"bc1pxwww0ct9ue7e8tdnlmug5m2tamfn7q06sahstg39ys4c9f3340qqxrdu9k",
+		"tb1q9n5enzz67y7xqeqdvqj2ep072t5rvm05rfvque",
 	}
 
 	for _, addr := range validAddress {
