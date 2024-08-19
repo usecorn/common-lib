@@ -66,7 +66,7 @@ func Test_FloatToNumeric(t *testing.T) {
 
 	f2, err := NumericToFloat(n)
 	require.NoError(t, err)
-	require.EqualValues(t, f, f2)
+	require.EqualValues(t, f.String(), f2.String())
 }
 
 func Test_RatToNumeric(t *testing.T) {
