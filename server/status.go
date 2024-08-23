@@ -20,6 +20,7 @@ type EthClient interface {
 type StatusChecker struct {
 	keys       map[string]struct{}
 	databases  map[string]Database
+	fns        map[string]func(context.Context) error
 	ethclients map[string]EthClient
 	log        logrus.Ext1FieldLogger
 }
@@ -30,6 +31,7 @@ func NewStatusChecker(log logrus.Ext1FieldLogger) *StatusChecker {
 		keys:       make(map[string]struct{}),
 		databases:  make(map[string]Database),
 		ethclients: make(map[string]EthClient),
+		fns:        make(map[string]func(context.Context) error),
 	}
 }
 
@@ -48,6 +50,15 @@ func (sc *StatusChecker) AddEthClient(key string, ec EthClient) error {
 	}
 	sc.keys[key] = struct{}{}
 	sc.ethclients[key] = ec
+	return nil
+}
+
+func (sc *StatusChecker) AddFn(key string, fn func(context.Context) error) error {
+	if _, ok := sc.keys[key]; ok {
+		return errors.Errorf("key %s already exists", key)
+	}
+	sc.keys[key] = struct{}{}
+	sc.fns[key] = fn
 	return nil
 }
 
@@ -72,6 +83,14 @@ func (sc *StatusChecker) Check(c *gin.Context) {
 			resChan <- healthCheckResult{key, err}
 		}(key, ec)
 	}
+
+	for key, fn := range sc.fns {
+		go func(key string, fn func(context.Context) error) {
+			err := fn(c)
+			resChan <- healthCheckResult{key, err}
+		}(key, fn)
+	}
+
 	healthy := true
 	status := map[string]string{}
 	for range sc.keys {
