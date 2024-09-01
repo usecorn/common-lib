@@ -4,8 +4,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/cornbase/common-lib/bitcoin"
 	"github.com/pkg/errors"
+
+	"github.com/cornbase/common-lib/bitcoin"
 )
 
 const (
