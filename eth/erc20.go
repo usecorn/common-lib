@@ -22,7 +22,7 @@ type E20Cache interface {
 	GetUint64(key string) (uint64, error)
 }
 
-type erc20Transfers struct {
+type erc20 struct {
 	log       logrus.Ext1FieldLogger
 	erc20     *contracts.ERC20
 	token     string
@@ -33,6 +33,7 @@ type erc20Transfers struct {
 
 type ERC20 interface {
 	TransferEvents(ctx context.Context, start, end uint64) ([]ERC20Transfer, error)
+	BalanceOf(ctx context.Context, addr common.Address) (*big.Int, error)
 	Decimals(ctx context.Context) (int, error)
 }
 
@@ -41,7 +42,7 @@ func NewERC20(log logrus.Ext1FieldLogger, metaDB E20Cache, ethClient *ethclient.
 	if err != nil {
 		return nil, err
 	}
-	return &erc20Transfers{
+	return &erc20{
 		log:       log,
 		erc20:     erc20Contract,
 		token:     strings.ToLower(addr.Hex()),
@@ -51,7 +52,11 @@ func NewERC20(log logrus.Ext1FieldLogger, metaDB E20Cache, ethClient *ethclient.
 	}, nil
 }
 
-func (et *erc20Transfers) TransferEvents(ctx context.Context, start, end uint64) ([]ERC20Transfer, error) {
+func (et *erc20) BalanceOf(ctx context.Context, addr common.Address) (*big.Int, error) {
+	return et.erc20.BalanceOf(&bind.CallOpts{Context: ctx}, addr)
+}
+
+func (et *erc20) TransferEvents(ctx context.Context, start, end uint64) ([]ERC20Transfer, error) {
 	iter, err := et.erc20.FilterTransfer(&bind.FilterOpts{
 		Start:   start,
 		End:     &end,
@@ -79,7 +84,7 @@ func (et *erc20Transfers) TransferEvents(ctx context.Context, start, end uint64)
 	return out, et.fillTimestamps(ctx, out)
 }
 
-func (et *erc20Transfers) fillTimestamps(ctx context.Context, events []ERC20Transfer) error {
+func (et *erc20) fillTimestamps(ctx context.Context, events []ERC20Transfer) error {
 	blockTimestamps := make(map[uint64]uint64)
 	for _, event := range events {
 		blockTimestamps[event.BlockNumber] = 0
@@ -99,7 +104,7 @@ func (et *erc20Transfers) fillTimestamps(ctx context.Context, events []ERC20Tran
 	return nil
 }
 
-func (et *erc20Transfers) Decimals(ctx context.Context) (int, error) {
+func (et *erc20) Decimals(ctx context.Context) (int, error) {
 
 	if et.decimals != -1 {
 		return et.decimals, nil
