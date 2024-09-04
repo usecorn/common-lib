@@ -3,6 +3,8 @@ package config
 import (
 	"time"
 
+	sentrygin "github.com/getsentry/sentry-go/gin"
+	"github.com/gin-gonic/gin"
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
@@ -18,6 +20,14 @@ type SentryConfig struct {
 
 func (sc SentryConfig) SentryEnabled() bool {
 	return len(sc.DSN) != 0 && sc.Enabled
+}
+
+func (sc SentryConfig) NewGinMiddleware() gin.HandlerFunc {
+	return sentrygin.New(sentrygin.Options{
+		Repanic:         sc.Repanic,
+		WaitForDelivery: sc.WaitForDelivery,
+		Timeout:         sc.Timeout,
+	})
 }
 
 func NewSentryConfig() (SentryConfig, error) {
