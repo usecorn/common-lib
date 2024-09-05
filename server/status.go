@@ -80,6 +80,10 @@ func (sc *StatusChecker) Check(c *gin.Context) {
 	for key, ec := range sc.ethclients {
 		go func(key string, ec EthClient) {
 			_, err := ec.BlockNumber(c)
+			if err != nil {
+				sc.log.WithError(err).Error("health check failed")
+				err = errors.New("failed to connect to eth client, see logs for details")
+			}
 			resChan <- healthCheckResult{key, err}
 		}(key, ec)
 	}
