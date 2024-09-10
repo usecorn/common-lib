@@ -52,6 +52,10 @@ func IsRootReferralCode(code string) bool {
 	return len(code) == 9 && code[0] == 'z'
 }
 
+func IsKOLReferralCode(code string) bool {
+	return len(code) == 9 && code[0] == 'i'
+}
+
 // NewRootReferralCode creates a new root referral code.
 // root referral codes are similiar to referral codes, but the first character is
 // always z. This means it will never validate as normal referral code.
