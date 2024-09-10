@@ -3,6 +3,7 @@ package config
 import (
 	"time"
 
+	"github.com/getsentry/sentry-go"
 	sentrygin "github.com/getsentry/sentry-go/gin"
 	"github.com/gin-gonic/gin"
 	"github.com/ilyakaznacheev/cleanenv"
@@ -20,6 +21,20 @@ type SentryConfig struct {
 
 func (sc SentryConfig) SentryEnabled() bool {
 	return len(sc.DSN) != 0 && sc.Enabled
+}
+
+func (sc SentryConfig) SetupSentry(name, version, env string) error {
+	if !sc.SentryEnabled() {
+		return nil
+	}
+	return sentry.Init(sentry.ClientOptions{
+		Dsn:              sc.DSN,
+		EnableTracing:    sc.EnableTrace,
+		TracesSampleRate: sc.SampleRate,
+		ServerName:       name,
+		Release:          version,
+		Environment:      env,
+	})
 }
 
 func (sc SentryConfig) NewGinMiddleware() gin.HandlerFunc {
