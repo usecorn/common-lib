@@ -52,7 +52,7 @@ func IsRootReferralCode(code string) bool {
 	return len(code) == 9 && code[0] == 'z'
 }
 
-// NewRootReferralCode created a new root referral code.
+// NewRootReferralCode creates a new root referral code.
 // root referral codes are similiar to referral codes, but the first character is
 // always z. This means it will never validate as normal referral code.
 // They are never created by a user and nobody gets a referral bonus from them.
@@ -63,5 +63,18 @@ func NewRootReferralCode() (string, error) {
 		return "", errors.Wrap(err, "failed to generate root referral code")
 	}
 	code = "z" + code[1:]
+	return code, nil
+}
+
+// NewKOLReferralCode creates a new kol referral code.
+// This code is identical to a normal referral code, but the first character is
+// always i. This means it will never validate as normal referral code.
+func NewKOLReferralCode() (string, error) {
+	// First we generate a referral code
+	code, err := NewReferralCode()
+	if err != nil {
+		return "", errors.Wrap(err, "failed to generate root referral code")
+	}
+	code = "i" + code[1:]
 	return code, nil
 }
