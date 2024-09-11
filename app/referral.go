@@ -10,10 +10,11 @@ import (
 var (
 	ReferralCodeExp     = regexp.MustCompile(`^[3-9|a-h|j-k|m|n|p|r-t|x|y]{4}-[3-9|a-h|j-k|m|n|p|r-t|x|y]{4}$`)
 	RootReferralCodeExp = regexp.MustCompile(`^z[3-9|a-h|j-k|m|n|p|r-t|x|y]{3}-[3-9|a-h|j-k|m|n|p|r-t|x|y]{4}$`)
+	KOLReferralCodeExp  = regexp.MustCompile(`^i[3-9|a-h|j-k|m|n|p|r-t|x|y]{3}-[3-9|a-h|j-k|m|n|p|r-t|x|y]{4}$`)
 )
 
 // Note: Excludes ilqsvwz012
-// Special: z, 0
+// Special: z, 0, i
 const referralChars = "3456789abcdefghjkmnprtxy"
 
 func NewReferralCode() (string, error) {
@@ -44,6 +45,9 @@ func NewReferralCode() (string, error) {
 func IsValidReferralCode(code string) bool {
 	if IsRootReferralCode(code) {
 		return RootReferralCodeExp.MatchString(code)
+	}
+	if IsKOLReferralCode(code) {
+		return KOLReferralCodeExp.MatchString(code)
 	}
 	return ReferralCodeExp.MatchString(code)
 }
