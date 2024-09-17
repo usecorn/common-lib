@@ -42,6 +42,9 @@ func (e EarnRequestFullBatch) WithReferralBonuses(referralChains [][]string, tie
 
 	out := e.Clone()
 
+	out.SourceUsers = make([]string, len(e.UserAddrs))
+	copy(out.SourceUsers, e.UserAddrs)
+
 	for i := range referralChains {
 		earnRate, ok := conversions.NewLargeFloat().SetString(e.EarnRates[i])
 		if !ok {
