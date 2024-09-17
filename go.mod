@@ -13,6 +13,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/jackc/pgtype v1.14.3
+	github.com/jinzhu/copier v0.4.0
 	github.com/joonix/log v0.0.0-20230221083239-7988383bab32
 	github.com/penglongli/gin-metrics v0.1.10
 	github.com/pkg/errors v0.9.1

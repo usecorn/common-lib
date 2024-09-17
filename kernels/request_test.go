@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/cornbase/common-lib/testutils"
 	"github.com/stretchr/testify/require"
+
+	"github.com/cornbase/common-lib/testutils"
 )
 
 func Test_EarnRequest_Validate(t *testing.T) {

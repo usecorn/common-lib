@@ -3,8 +3,10 @@ package kernels
 import (
 	"math/big"
 
+	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
 
+	"github.com/cornbase/common-lib/conversions"
 	"github.com/cornbase/common-lib/validate"
 )
 
@@ -25,6 +27,42 @@ func (e EarnRequestFullBatch) IsPerBlock() bool {
 
 func (e EarnRequestFullBatch) Size() int {
 	return len(e.UserAddrs)
+}
+
+func (e EarnRequestFullBatch) Clone() EarnRequestFullBatch {
+	var out EarnRequestFullBatch
+	err := copier.Copy(&out, &e)
+	if err != nil {
+		panic(err)
+	}
+	return out
+}
+
+func (e EarnRequestFullBatch) WithReferralBonuses(referralChains [][]string, tierEarnRates map[int]float64) (EarnRequestFullBatch, error) {
+
+	out := e.Clone()
+
+	for i := range referralChains {
+		earnRate, ok := conversions.NewLargeFloat().SetString(e.EarnRates[i])
+		if !ok {
+			return EarnRequestFullBatch{}, errors.New("invalid earn rate")
+		}
+		for j := range referralChains[i] {
+			out.UserAddrs = append(out.UserAddrs, referralChains[i][j])
+			out.Sources = append(out.Sources, out.Sources[i])
+			out.SubSources = append(out.SubSources, out.SubSources[i])
+			out.SourceUsers = append(out.SourceUsers, out.UserAddrs[i])
+			if out.IsPerBlock() {
+				out.StartBlocks = append(out.StartBlocks, out.StartBlocks[i])
+			}
+			out.StartTimes = append(out.StartTimes, out.StartTimes[i])
+			earnRateTier := big.NewFloat(tierEarnRates[j])
+			earnRateTier.Mul(earnRate, earnRateTier)
+			out.EarnRates = append(out.EarnRates, earnRateTier.String())
+		}
+	}
+
+	return out, nil
 }
 
 func (e EarnRequestFullBatch) Validate() error {
@@ -205,6 +243,15 @@ func (e EarnRequestBatch) Validate() error {
 	return nil
 }
 
+func (er EarnRequestBatch) Clone() EarnRequestBatch {
+	var out EarnRequestBatch
+	err := copier.Copy(&out, &er)
+	if err != nil {
+		panic(err)
+	}
+	return out
+}
+
 func (e EarnRequestBatch) WithReferralBonuses(referralChains [][]string, tierEarnRates map[int]float64) (EarnRequestBatch, error) {
 
 	out := EarnRequestBatch{
@@ -222,7 +269,7 @@ func (e EarnRequestBatch) WithReferralBonuses(referralChains [][]string, tierEar
 	copy(out.SourceUsers, e.UserAddrs)
 
 	for i := range referralChains {
-		earnRate, ok := big.NewFloat(0).SetString(e.EarnRates[i])
+		earnRate, ok := conversions.NewLargeFloat().SetString(e.EarnRates[i])
 		if !ok {
 			return EarnRequestBatch{}, errors.New("invalid earn rate")
 		}
