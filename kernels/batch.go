@@ -75,9 +75,6 @@ func (e EarnRequestFullBatch) Validate() error {
 	if len(e.UserAddrs) != len(e.SubSources) {
 		return errors.New("userAddrs and subSources must be the same length")
 	}
-	if len(e.UserAddrs) != len(e.StartBlocks) {
-		return errors.New("userAddrs and startBlocks must be the same length")
-	}
 	if len(e.UserAddrs) != len(e.StartTimes) {
 		return errors.New("userAddrs and startTimes must be the same length")
 	}
