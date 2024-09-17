@@ -3,6 +3,7 @@ package kernels
 import (
 	"math/big"
 
+	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
 )
 
@@ -14,6 +15,15 @@ type EarnRequest struct {
 	StartBlock int64  `json:"startBlock"`
 	StartTime  int64  `json:"startTime"`
 	EarnRate   string `json:"earnRate"`
+}
+
+func (er EarnRequest) Clone() EarnRequest {
+	var out EarnRequest
+	err := copier.Copy(&out, &er)
+	if err != nil {
+		panic(err)
+	}
+	return out
 }
 
 func (e EarnRequest) ReferralBonuses(referralChain []string, tierEarnRates map[int]float64) ([]EarnRequest, error) {
