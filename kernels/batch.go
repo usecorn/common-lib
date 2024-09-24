@@ -319,3 +319,19 @@ func BatchEarnRequests(earnRequests []EarnRequest) (EarnRequestBatch, error) {
 
 	return out, nil
 }
+
+func MakeManyEarnRequestBatches(earnRequests []EarnRequest, batchSize int) ([]EarnRequestBatch, error) {
+	var out []EarnRequestBatch
+	for i := 0; i < len(earnRequests); i += batchSize {
+		end := i + batchSize
+		if end > len(earnRequests) {
+			end = len(earnRequests)
+		}
+		batch, err := BatchEarnRequests(earnRequests[i:end])
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, batch)
+	}
+	return out, nil
+}
