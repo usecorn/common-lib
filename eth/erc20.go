@@ -77,6 +77,7 @@ func (et *erc20) TransferEvents(ctx context.Context, start, end uint64) ([]ERC20
 			LogIndex:    iter.Event.Raw.Index,
 			Token:       et.token,
 			BlockNumber: iter.Event.Raw.BlockNumber,
+			TXIndex:     iter.Event.Raw.TxIndex,
 		})
 
 	}

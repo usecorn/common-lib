@@ -4,14 +4,43 @@ import (
 	"context"
 	"database/sql"
 	"math/big"
+	"sort"
 	"time"
 
-	gtypes "github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/core/types"
 )
 
 type EthClient interface {
 	BlockNumber(ctx context.Context) (uint64, error)
-	BlockByNumber(ctx context.Context, number *big.Int) (*gtypes.Block, error)
+	BlockByNumber(ctx context.Context, number *big.Int) (*types.Block, error)
+}
+
+func CalcSortIndex(blockNumber uint64, logIndex, txIndex uint) uint64 {
+	// Test assumptions
+	if blockNumber > 0xFFFFFFFF {
+		panic("Block number is too large")
+	}
+	if txIndex > 0xFFFF {
+		panic("Tx index is too large")
+	}
+	if logIndex > 0xFFFF {
+		panic("Log index is too large")
+	}
+	// End test assumptions
+
+	// Block number has the highest priority
+	var out uint64 = 0xFFFFFFFF & blockNumber
+	out = out << 16
+	// Next is tx index
+	out = out | (0xFFFF & uint64(txIndex))
+	out = out << 16
+	// Finally we have log index
+	out = out | (0xFFFF & uint64(logIndex))
+	return out
+}
+
+func CalcSortIndexFromLog(raw *types.Log) uint64 {
+	return CalcSortIndex(raw.BlockNumber, raw.Index, raw.TxIndex)
 }
 
 type ERC20Transfer struct {
@@ -23,6 +52,11 @@ type ERC20Transfer struct {
 	Token       string
 	BlockNumber uint64
 	Timestamp   time.Time
+	TXIndex     uint
+}
+
+func (et ERC20Transfer) SortIndex() uint64 {
+	return CalcSortIndex(et.BlockNumber, et.LogIndex, et.TXIndex)
 }
 
 func (et ERC20Transfer) IsMint() bool {
@@ -51,4 +85,10 @@ func (et ERC20Transfer) SQLTo() sql.NullString {
 type Result[T any] struct {
 	Err error
 	Val T
+}
+
+func SortTransfers(transfers []ERC20Transfer) {
+	sort.Slice(transfers, func(i, j int) bool { // We need to handle these events in order.
+		return transfers[i].SortIndex() < transfers[j].SortIndex()
+	})
 }
