@@ -16,7 +16,7 @@ require (
 	github.com/jackc/pgtype v1.14.3
 	github.com/jinzhu/copier v0.4.0
 	github.com/numbergroup/cleanenv v1.7.0
-	github.com/numbergroup/gin-metrics v0.2.0
+	github.com/numbergroup/gin-metrics v0.2.1
 	github.com/numbergroup/log v1.1.1
 	github.com/samber/lo v1.47.0
 	github.com/sirupsen/logrus v1.9.3

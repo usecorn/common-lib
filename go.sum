@@ -307,8 +307,8 @@ github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 h1:C3w9PqII01/Oq
 github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822/go.mod h1:+n7T8mK8HuQTcFwEeznm/DIxMOiR9yIdICNftLE1DvQ=
 github.com/numbergroup/cleanenv v1.7.0 h1:jNzCiNPtZQNKrdrSoy8hWrwPAoDyP/xdO02ZuBNZ9NY=
 github.com/numbergroup/cleanenv v1.7.0/go.mod h1:VtPKSWKtgfEMKueNS8IWVlU4Dgm7nAAh4kowLzR9H9A=
-github.com/numbergroup/gin-metrics v0.2.0 h1:cRDJsMeoeDW5l/g8bAvk2njnpFgP6o2NO5qBBsFLCBc=
-github.com/numbergroup/gin-metrics v0.2.0/go.mod h1:k8lDP1gjzrrhDVe1RGMt84OpHiy+uwlFfEEjlxvGlYg=
+github.com/numbergroup/gin-metrics v0.2.1 h1:dfAOv0/sbVkYb7DCNKAe+nxM13TKYfWT9KvOSaR4aGU=
+github.com/numbergroup/gin-metrics v0.2.1/go.mod h1:IIGZvcjFyOMZ98y6Y4/S6uYUblRgUdS48f2qQdwUKog=
 github.com/numbergroup/log v1.1.1 h1:Pbpn5v49iaZWCoPx/hegIf7+3hPhOrHXQKT4RpoWSqY=
 github.com/numbergroup/log v1.1.1/go.mod h1:FcxpB2l7crDaffNh6bkgJJnT61Pym+StLtj8QQY+t5s=
 github.com/olekukonko/tablewriter v0.0.5 h1:P2Ga83D34wi1o9J6Wh1mRuqd4mF/x/lgBS7N7AbDhec=
