@@ -3,7 +3,7 @@ package server
 import (
 	"time"
 
-	"github.com/ilyakaznacheev/cleanenv"
+	"github.com/numbergroup/cleanenv"
 )
 
 type ServerConfig struct {

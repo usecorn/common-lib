@@ -6,7 +6,7 @@ import (
 	"github.com/getsentry/sentry-go"
 	sentrygin "github.com/getsentry/sentry-go/gin"
 	"github.com/gin-gonic/gin"
-	"github.com/ilyakaznacheev/cleanenv"
+	"github.com/numbergroup/cleanenv"
 )
 
 type SentryConfig struct {

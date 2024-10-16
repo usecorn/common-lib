@@ -12,9 +12,9 @@ require (
 	github.com/getsentry/sentry-go v0.29.0
 	github.com/gin-gonic/gin v1.10.0
 	github.com/google/uuid v1.6.0
-	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/jackc/pgtype v1.14.3
 	github.com/jinzhu/copier v0.4.0
+	github.com/numbergroup/cleanenv v1.7.0
 	github.com/numbergroup/log v1.1.1
 	github.com/penglongli/gin-metrics v0.1.10
 	github.com/pkg/errors v0.9.1
