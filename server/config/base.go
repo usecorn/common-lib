@@ -1,7 +1,7 @@
 package config
 
 import (
-	joonix "github.com/joonix/log"
+	joonix "github.com/numbergroup/log"
 	"github.com/sirupsen/logrus"
 )
 
