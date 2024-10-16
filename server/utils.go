@@ -9,10 +9,10 @@ import (
 	"sync/atomic"
 	"syscall"
 
+	"github.com/cockroachdb/errors"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/penglongli/gin-metrics/ginmetrics"
-	"github.com/pkg/errors"
+	"github.com/numbergroup/gin-metrics/ginmetrics"
 	"github.com/sirupsen/logrus"
 )
 

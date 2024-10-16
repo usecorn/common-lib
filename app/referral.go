@@ -4,7 +4,7 @@ import (
 	"crypto/rand"
 	"regexp"
 
-	"github.com/pkg/errors"
+	"github.com/cockroachdb/errors"
 )
 
 var (

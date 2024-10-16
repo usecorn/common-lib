@@ -1,6 +1,6 @@
 package bitcoin
 
-import "github.com/pkg/errors"
+import "github.com/cockroachdb/errors"
 
 func ParseWitnessSignatureBIP322(sigBytes []byte) ([][]byte, error) {
 	if len(sigBytes) < 66 {

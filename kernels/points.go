@@ -1,6 +1,6 @@
 package kernels
 
-import "github.com/pkg/errors"
+import "github.com/cockroachdb/errors"
 
 type PointsEarnRequestFullBatch struct {
 	EarnRequestFullBatch

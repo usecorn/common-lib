@@ -3,8 +3,8 @@ package kernels
 import (
 	"math/big"
 
+	"github.com/cockroachdb/errors"
 	"github.com/jinzhu/copier"
-	"github.com/pkg/errors"
 
 	"github.com/cornbase/common-lib/conversions"
 	"github.com/cornbase/common-lib/validate"

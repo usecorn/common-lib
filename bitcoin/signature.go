@@ -6,8 +6,8 @@ import (
 
 	"github.com/btcsuite/btcd/btcec/v2/ecdsa"
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
+	"github.com/cockroachdb/errors"
 	secp2561k1 "github.com/decred/dcrd/dcrec/secp256k1/v4"
-	"github.com/pkg/errors"
 	"github.com/samber/lo"
 )
 
