@@ -3,7 +3,7 @@ package kernels
 import (
 	"testing"
 
-	"github.com/cornbase/common-lib/testutils"
+	"github.com/usecorn/common-lib/testutils"
 	"github.com/stretchr/testify/require"
 )
 

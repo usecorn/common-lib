@@ -6,7 +6,7 @@ import (
 
 	"github.com/cockroachdb/errors"
 
-	"github.com/cornbase/common-lib/bitcoin"
+	"github.com/usecorn/common-lib/bitcoin"
 )
 
 const (

@@ -1,4 +1,4 @@
-module github.com/cornbase/common-lib
+module github.com/usecorn/common-lib
 
 go 1.22.0
 

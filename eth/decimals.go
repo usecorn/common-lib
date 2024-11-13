@@ -3,7 +3,7 @@ package eth
 import (
 	"math/big"
 
-	"github.com/cornbase/common-lib/conversions"
+	"github.com/usecorn/common-lib/conversions"
 )
 
 func ToDecimalForm(balance *big.Int, decimals int) *big.Float {

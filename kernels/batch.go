@@ -6,8 +6,8 @@ import (
 	"github.com/cockroachdb/errors"
 	"github.com/jinzhu/copier"
 
-	"github.com/cornbase/common-lib/conversions"
-	"github.com/cornbase/common-lib/validate"
+	"github.com/usecorn/common-lib/conversions"
+	"github.com/usecorn/common-lib/validate"
 )
 
 // EarnRequestFullBatch is a batch of unrelated earn requests

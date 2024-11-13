@@ -12,7 +12,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/sirupsen/logrus"
 
-	"github.com/cornbase/common-lib/eth/contracts"
+	"github.com/usecorn/common-lib/eth/contracts"
 )
 
 type E20Cache interface {
