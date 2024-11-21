@@ -196,3 +196,12 @@ func SafeMetricsGauge(log logrus.Ext1FieldLogger, metric *ginmetrics.Metric, lab
 		}
 	}
 }
+
+// CloudflareOriginIP gets the origin IP from the Cloudflare header, or falls back to the client IP if the header is not set.
+func CloudflareOriginIP(c *gin.Context) string {
+	ip := c.GetHeader("CF-Connecting-IP")
+	if len(ip) == 0 { // fallback to client ip
+		ip = c.ClientIP()
+	}
+	return ip
+}
