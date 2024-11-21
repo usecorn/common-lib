@@ -1,6 +1,9 @@
 package kernels
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 var (
 	ErrMissingStart         = fmt.Errorf("must have either startBlock or startTime")
@@ -18,3 +21,10 @@ var (
 	ErrInvalidEarnRate      = fmt.Errorf("invalid earn rate")
 	ErrEmptyBatch           = fmt.Errorf("batch cannot be empty")
 )
+
+func IsErrTooOld(err error) bool {
+	if err == nil {
+		return false
+	}
+	return strings.Contains(err.Error(), "update starting_at to a value less than the previous starting_at")
+}
