@@ -2,9 +2,12 @@ package kernels
 
 import (
 	"math/big"
+	"strings"
 
 	"github.com/cockroachdb/errors"
+	"github.com/google/uuid"
 	"github.com/jinzhu/copier"
+	"github.com/usecorn/common-lib/validate"
 )
 
 type EarnRequest struct {
@@ -91,4 +94,66 @@ func (e EarnRequest) Validate() error {
 
 func (e EarnRequest) IsPerBlock() bool {
 	return e.StartBlock != 0 // If startBlock is set, then it's per block
+}
+
+type GrantRequest struct {
+	UUID            uuid.UUID `json:"uuid"`
+	UserAddr        string    `json:"userAddr"`
+	Amount          int64     `json:"amount"`
+	Source          string    `json:"source"`
+	SourceUser      string    `json:"-"`
+	Category        string    `json:"category"`
+	GrantTime       int64     `json:"grantTime"`
+	ExcludeReferral bool      `json:"excludeReferral"`
+}
+
+func (gr GrantRequest) GetSourceUser() string {
+	if gr.SourceUser == "" {
+		return strings.ToLower(gr.UserAddr)
+	}
+	return strings.ToLower(gr.SourceUser)
+}
+
+func (gr GrantRequest) ReferralBonuses(referralChain []string, tierEarnRates map[int]float64) []GrantRequest {
+	var out []GrantRequest
+	if gr.Amount <= 0 { // Referral penalties definitely shouldn't exist
+		return nil
+	}
+
+	for i := range referralChain {
+		req := GrantRequest{
+			UUID:       uuid.NewSHA1(gr.UUID, []byte{byte(i >> 24 & 0xFF), byte(i >> 16 & 0xFF), byte(i >> 8 & 0xFF), byte(i & 0xFF)}),
+			UserAddr:   referralChain[i],
+			Amount:     int64(float64(gr.Amount) * tierEarnRates[i]),
+			Source:     gr.Source,
+			SourceUser: gr.GetSourceUser(),
+		}
+		out = append(out, req)
+	}
+	return out
+}
+
+func (g GrantRequest) Validate() error {
+	if len(g.UserAddr) != 42 {
+		return ErrInvalidUserAddr
+	}
+
+	if !validate.EthAddrExp.MatchString(g.UserAddr) {
+		return ErrInvalidUserAddr
+	}
+
+	if len(g.Source) == 0 {
+		return ErrEmptySource
+	}
+	if len(g.Category) == 0 {
+		return ErrEmptyCategory
+	}
+	if g.GrantTime == 0 {
+		return ErrMissingGrantTime
+	}
+	if g.Amount <= 0 {
+		return ErrNegativeAmount
+	}
+	return nil
+
 }

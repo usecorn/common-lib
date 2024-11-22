@@ -12,7 +12,7 @@ const (
 )
 
 var (
-	ethAddrExp        = regexp.MustCompile(EthAddrRegex)
+	EthAddrExp        = regexp.MustCompile(EthAddrRegex)
 	ErrInvalidEthAddr = errors.New("invalid ethereum address")
 )
 
@@ -26,7 +26,7 @@ func GetValidEthAddr(addr string) (string, error) {
 	if len(out) != 42 { // 0x + 40 characters
 		return "", ErrInvalidEthAddr
 	}
-	if !ethAddrExp.MatchString(out) {
+	if !EthAddrExp.MatchString(out) {
 		return "", ErrInvalidEthAddr
 	}
 	return out, nil
