@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 
 	"github.com/usecorn/common-lib/testutils"
@@ -219,4 +220,113 @@ func Test_EarnRequest_ReferralBonuses(t *testing.T) {
 	require.EqualValues(t, fmt.Sprintf("%d", int(100*tierRates[0])), bonuses[0].EarnRate)
 	require.EqualValues(t, fmt.Sprintf("%d", int(100*tierRates[1])), bonuses[1].EarnRate)
 
+}
+
+func Test_GrantRequest_ReferralBonuses(t *testing.T) {
+	tierRates := map[int]float64{
+		0: 0.1,
+		1: 0.2,
+		2: 0.3,
+		3: 0.4,
+	}
+	t.Parallel()
+
+	id := uuid.New()
+	t.Run("negative amount", func(t *testing.T) {
+		req := GrantRequest{
+			UUID:     id,
+			Amount:   -100,
+			UserAddr: testutils.GenRandEVMAddr(),
+			Source:   "ohio",
+			Category: "category",
+		}
+
+		res := req.ReferralBonuses([]string{testutils.GenRandEVMAddr(), testutils.GenRandEVMAddr()}, tierRates)
+
+		require.Nil(t, res)
+	})
+
+	t.Run("valid request", func(t *testing.T) {
+		req := GrantRequest{
+			UUID:     id,
+			Amount:   100,
+			UserAddr: testutils.GenRandEVMAddr(),
+			Source:   "kansas",
+			Category: "category",
+		}
+
+		addrs := []string{testutils.GenRandEVMAddr(), testutils.GenRandEVMAddr()}
+
+		res := req.ReferralBonuses(addrs, tierRates)
+
+		require.Len(t, res, 2)
+
+		for i := range res {
+			require.NotEqual(t, req.UUID, res[i].UUID)
+			require.Equal(t, addrs[i], res[i].UserAddr)
+			require.Equal(t, int64(float64(req.Amount)*tierRates[i]), res[i].Amount)
+		}
+	})
+
+	t.Run("uuids are stable", func(t *testing.T) {
+		req := GrantRequest{
+			UUID:     id,
+			Amount:   100,
+			UserAddr: testutils.GenRandEVMAddr(),
+			Source:   "arkansas",
+		}
+
+		addrs := []string{testutils.GenRandEVMAddr(), testutils.GenRandEVMAddr()}
+
+		res := req.ReferralBonuses(addrs, tierRates)
+
+		require.Len(t, res, 2)
+
+		res2 := req.ReferralBonuses(addrs, tierRates)
+
+		for i := range res {
+			require.EqualValues(t, res[i].UUID, res2[i].UUID)
+		}
+	})
+
+}
+
+func Test_GrantRequest_Validate(t *testing.T) {
+	t.Parallel()
+	tests := []struct {
+		name string
+		req  GrantRequest
+		err  error
+	}{
+		{
+			name: "invalid user address",
+			req: GrantRequest{
+				UUID:      uuid.New(),
+				UserAddr:  testutils.GenRandEVMAddr() + "5",
+				Amount:    100,
+				GrantTime: 123214251,
+				Category:  "category",
+			},
+			err: ErrInvalidUserAddr,
+		},
+		{
+			name: "valid user address",
+			req: GrantRequest{
+				UUID:      uuid.New(),
+				UserAddr:  testutils.GenRandEVMAddr(),
+				Amount:    100,
+				Source:    "wyoming",
+				Category:  "category",
+				GrantTime: 123214251,
+			},
+			err: nil,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.req.Validate()
+			require.EqualValues(t, tt.err, err)
+		})
+	}
 }

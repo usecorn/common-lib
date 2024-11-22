@@ -28,3 +28,11 @@ func IsErrTooOld(err error) bool {
 	}
 	return strings.Contains(err.Error(), "update starting_at to a value less than the previous starting_at")
 }
+
+type KernelError struct {
+	Err string `json:"error"`
+}
+
+func (ke KernelError) Error() string {
+	return ke.Err
+}
