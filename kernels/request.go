@@ -101,6 +101,7 @@ type GrantRequest struct {
 	UserAddr        string    `json:"userAddr"`
 	Amount          int64     `json:"amount"`
 	Source          string    `json:"source"`
+	SubSource       string    `json:"subSource"`
 	SourceUser      string    `json:"-"`
 	Category        string    `json:"category"`
 	GrantTime       int64     `json:"grantTime"`
