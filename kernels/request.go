@@ -7,6 +7,7 @@ import (
 	"github.com/cockroachdb/errors"
 	"github.com/google/uuid"
 	"github.com/jinzhu/copier"
+	"github.com/usecorn/common-lib/conversions"
 	"github.com/usecorn/common-lib/validate"
 )
 
@@ -29,7 +30,7 @@ func (er EarnRequest) Clone() EarnRequest {
 	return out
 }
 
-func (e EarnRequest) ReferralBonuses(referralChain []string, tierEarnRates map[int]float64) ([]EarnRequest, error) {
+func (e EarnRequest) ReferralBonuses(referralChain []string, tierEarnRates map[int]*big.Rat) ([]EarnRequest, error) {
 	var out []EarnRequest
 
 	for i := range referralChain {
@@ -45,7 +46,8 @@ func (e EarnRequest) ReferralBonuses(referralChain []string, tierEarnRates map[i
 		if !ok {
 			return nil, errors.New("invalid earn rate")
 		}
-		earnRate.Mul(earnRate, big.NewFloat(tierEarnRates[i]))
+
+		earnRate.Mul(earnRate, conversions.NewLargeFloat().SetRat(tierEarnRates[i]))
 
 		req.EarnRate = earnRate.String()
 		out = append(out, req)
@@ -99,7 +101,7 @@ func (e EarnRequest) IsPerBlock() bool {
 type GrantRequest struct {
 	UUID            uuid.UUID `json:"uuid"`
 	UserAddr        string    `json:"userAddr"`
-	Amount          int64     `json:"amount"`
+	Amount          string    `json:"amount"`
 	Source          string    `json:"source"`
 	SubSource       string    `json:"subSource"`
 	SourceUser      string    `json:"-"`
@@ -115,17 +117,24 @@ func (gr GrantRequest) GetSourceUser() string {
 	return strings.ToLower(gr.SourceUser)
 }
 
-func (gr GrantRequest) ReferralBonuses(referralChain []string, tierEarnRates map[int]float64) []GrantRequest {
+func (gr GrantRequest) ReferralBonuses(referralChain []string, tierEarnRates map[int]*big.Rat) []GrantRequest {
 	var out []GrantRequest
-	if gr.Amount <= 0 { // Referral penalties definitely shouldn't exist
+
+	parsedAmount, ok := big.NewRat(1, 1).SetString(gr.Amount)
+	if !ok {
+		// This should never happen
+		panic("invalid amount: " + gr.Amount)
+	}
+	if parsedAmount.Sign() < 1 { // Referral penalties definitely shouldn't exist
 		return nil
 	}
 
 	for i := range referralChain {
+		multiplier := big.NewRat(1, 1).Set(tierEarnRates[i])
 		req := GrantRequest{
 			UUID:       uuid.NewSHA1(gr.UUID, []byte{byte(i >> 24 & 0xFF), byte(i >> 16 & 0xFF), byte(i >> 8 & 0xFF), byte(i & 0xFF)}),
 			UserAddr:   referralChain[i],
-			Amount:     int64(float64(gr.Amount) * tierEarnRates[i]),
+			Amount:     multiplier.Mul(parsedAmount, multiplier).FloatString(20), // Points are accurate to 20 decimal places
 			Source:     gr.Source,
 			SourceUser: gr.GetSourceUser(),
 		}
@@ -152,7 +161,12 @@ func (g GrantRequest) Validate() error {
 	if g.GrantTime == 0 {
 		return ErrMissingGrantTime
 	}
-	if g.Amount <= 0 {
+	parsedAmount, ok := big.NewRat(1, 1).SetString(g.Amount)
+	if !ok {
+		return errors.Errorf("invalid amount: %s", g.Amount)
+	}
+
+	if parsedAmount.Sign() <= 0 {
 		return ErrNegativeAmount
 	}
 	return nil

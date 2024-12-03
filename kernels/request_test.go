@@ -2,6 +2,7 @@ package kernels
 
 import (
 	"fmt"
+	"math/big"
 	"testing"
 
 	"github.com/google/uuid"
@@ -196,11 +197,11 @@ func Test_EarnRequest_ReferralBonuses(t *testing.T) {
 		EarnRate:   "100",
 	}
 
-	tierRates := map[int]float64{
-		0: 0.1,
-		1: 0.2,
-		2: 0.3,
-		3: 0.4,
+	tierRates := map[int]*big.Rat{
+		0: big.NewRat(1, 10),
+		1: big.NewRat(1, 20),
+		2: big.NewRat(1, 30),
+		3: big.NewRat(1, 40),
 	}
 
 	referralChain := []string{testutils.GenRandEVMAddr(), testutils.GenRandEVMAddr()}
@@ -217,17 +218,23 @@ func Test_EarnRequest_ReferralBonuses(t *testing.T) {
 		require.Equal(t, rq.StartTime, bonuses[i].StartTime)
 	}
 
-	require.EqualValues(t, fmt.Sprintf("%d", int(100*tierRates[0])), bonuses[0].EarnRate)
-	require.EqualValues(t, fmt.Sprintf("%d", int(100*tierRates[1])), bonuses[1].EarnRate)
+	require.EqualValues(t, fmt.Sprintf("%d", int(100*1/tierRates[0].Denom().Int64())), bonuses[0].EarnRate)
+	require.EqualValues(t, fmt.Sprintf("%d", int(100*1/tierRates[1].Denom().Int64())), bonuses[1].EarnRate)
 
 }
 
 func Test_GrantRequest_ReferralBonuses(t *testing.T) {
-	tierRates := map[int]float64{
-		0: 0.1,
-		1: 0.2,
-		2: 0.3,
-		3: 0.4,
+	tierRates := map[int]*big.Rat{
+		0: big.NewRat(1, 10),
+		1: big.NewRat(2, 10),
+		2: big.NewRat(3, 10),
+		3: big.NewRat(4, 10),
+	}
+	expected := []string{
+		"10.00000000000000000000",
+		"20.00000000000000000000",
+		"30.00000000000000000000",
+		"40.00000000000000000000",
 	}
 	t.Parallel()
 
@@ -235,7 +242,7 @@ func Test_GrantRequest_ReferralBonuses(t *testing.T) {
 	t.Run("negative amount", func(t *testing.T) {
 		req := GrantRequest{
 			UUID:     id,
-			Amount:   -100,
+			Amount:   "-100",
 			UserAddr: testutils.GenRandEVMAddr(),
 			Source:   "ohio",
 			Category: "category",
@@ -249,7 +256,7 @@ func Test_GrantRequest_ReferralBonuses(t *testing.T) {
 	t.Run("valid request", func(t *testing.T) {
 		req := GrantRequest{
 			UUID:     id,
-			Amount:   100,
+			Amount:   "100",
 			UserAddr: testutils.GenRandEVMAddr(),
 			Source:   "kansas",
 			Category: "category",
@@ -264,14 +271,14 @@ func Test_GrantRequest_ReferralBonuses(t *testing.T) {
 		for i := range res {
 			require.NotEqual(t, req.UUID, res[i].UUID)
 			require.Equal(t, addrs[i], res[i].UserAddr)
-			require.Equal(t, int64(float64(req.Amount)*tierRates[i]), res[i].Amount)
+			require.Equal(t, expected[i], res[i].Amount)
 		}
 	})
 
 	t.Run("uuids are stable", func(t *testing.T) {
 		req := GrantRequest{
 			UUID:     id,
-			Amount:   100,
+			Amount:   "100",
 			UserAddr: testutils.GenRandEVMAddr(),
 			Source:   "arkansas",
 		}
@@ -303,7 +310,7 @@ func Test_GrantRequest_Validate(t *testing.T) {
 			req: GrantRequest{
 				UUID:      uuid.New(),
 				UserAddr:  testutils.GenRandEVMAddr() + "5",
-				Amount:    100,
+				Amount:    "100",
 				GrantTime: 123214251,
 				Category:  "category",
 			},
@@ -314,7 +321,7 @@ func Test_GrantRequest_Validate(t *testing.T) {
 			req: GrantRequest{
 				UUID:      uuid.New(),
 				UserAddr:  testutils.GenRandEVMAddr(),
-				Amount:    100,
+				Amount:    "100",
 				Source:    "wyoming",
 				Category:  "category",
 				GrantTime: 123214251,
