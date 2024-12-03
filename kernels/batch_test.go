@@ -1,10 +1,11 @@
 package kernels
 
 import (
+	"math/big"
 	"testing"
 
-	"github.com/usecorn/common-lib/testutils"
 	"github.com/stretchr/testify/require"
+	"github.com/usecorn/common-lib/testutils"
 )
 
 func Test_EarnRequestFullBatch_WithReferralBonuses(t *testing.T) {
@@ -19,7 +20,7 @@ func Test_EarnRequestFullBatch_WithReferralBonuses(t *testing.T) {
 	}
 
 	referralChains := [][]string{{testutils.GenRandEVMAddr(), testutils.GenRandEVMAddr()}}
-	tierEarnRates := map[int]float64{0: 0.5, 1: 0.25}
+	tierEarnRates := map[int]*big.Rat{0: big.NewRat(1, 2), 1: big.NewRat(1, 4)}
 
 	result, err := req.WithReferralBonuses(referralChains, tierEarnRates)
 	require.NoError(t, err)

@@ -38,7 +38,7 @@ func (e EarnRequestFullBatch) Clone() EarnRequestFullBatch {
 	return out
 }
 
-func (e EarnRequestFullBatch) WithReferralBonuses(referralChains [][]string, tierEarnRates map[int]float64) (EarnRequestFullBatch, error) {
+func (e EarnRequestFullBatch) WithReferralBonuses(referralChains [][]string, tierEarnRates map[int]*big.Rat) (EarnRequestFullBatch, error) {
 
 	out := e.Clone()
 
@@ -59,7 +59,7 @@ func (e EarnRequestFullBatch) WithReferralBonuses(referralChains [][]string, tie
 				out.StartBlocks = append(out.StartBlocks, out.StartBlocks[i])
 			}
 			out.StartTimes = append(out.StartTimes, out.StartTimes[i])
-			earnRateTier := big.NewFloat(tierEarnRates[j])
+			earnRateTier := big.NewFloat(0).SetRat(tierEarnRates[j])
 			earnRateTier.Mul(earnRate, earnRateTier)
 			out.EarnRates = append(out.EarnRates, earnRateTier.String())
 		}
