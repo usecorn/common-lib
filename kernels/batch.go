@@ -252,7 +252,7 @@ func (er EarnRequestBatch) Clone() EarnRequestBatch {
 	return out
 }
 
-func (e EarnRequestBatch) WithReferralBonuses(referralChains [][]string, tierEarnRates map[int]float64) (EarnRequestBatch, error) {
+func (e EarnRequestBatch) WithReferralBonuses(referralChains [][]string, tierEarnRates map[int]*big.Rat) (EarnRequestBatch, error) {
 
 	out := EarnRequestBatch{
 		UserAddrs:   make([]string, len(e.UserAddrs)),
@@ -274,7 +274,7 @@ func (e EarnRequestBatch) WithReferralBonuses(referralChains [][]string, tierEar
 			return EarnRequestBatch{}, errors.New("invalid earn rate")
 		}
 		for j := range referralChains[i] {
-			earnRateTier := big.NewFloat(tierEarnRates[j])
+			earnRateTier := big.NewFloat(0).SetRat(tierEarnRates[j])
 			earnRateTier.Mul(earnRate, earnRateTier)
 			out.UserAddrs = append(out.UserAddrs, referralChains[i][j])
 			out.SourceUsers = append(out.SourceUsers, e.UserAddrs[i])
