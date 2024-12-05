@@ -29,6 +29,7 @@ type erc20 struct {
 	ethClient *ethclient.Client
 	metaDB    E20Cache
 	decimals  int
+	network   string
 }
 
 type ERC20 interface {
@@ -37,7 +38,7 @@ type ERC20 interface {
 	Decimals(ctx context.Context) (int, error)
 }
 
-func NewERC20(log logrus.Ext1FieldLogger, metaDB E20Cache, ethClient *ethclient.Client, addr common.Address) (ERC20, error) {
+func NewERC20(log logrus.Ext1FieldLogger, metaDB E20Cache, ethClient *ethclient.Client, addr common.Address, network string) (ERC20, error) {
 	erc20Contract, err := contracts.NewERC20(addr, ethClient)
 	if err != nil {
 		return nil, err
@@ -49,6 +50,7 @@ func NewERC20(log logrus.Ext1FieldLogger, metaDB E20Cache, ethClient *ethclient.
 		metaDB:    metaDB,
 		decimals:  -1,
 		ethClient: ethClient,
+		network:   network,
 	}, nil
 }
 
@@ -110,8 +112,13 @@ func (et *erc20) Decimals(ctx context.Context) (int, error) {
 	if et.decimals != -1 {
 		return et.decimals, nil
 	}
+	var decimalsKey string
+	if et.network == EthereumNetwork {
+		decimalsKey = "erc20::" + et.token + "::decimals"
+	} else {
+		decimalsKey = "erc20::" + et.network + "::" + et.token + "::decimals"
+	}
 
-	decimalsKey := "erc20::" + et.token + "::decimals"
 	decimals, err := et.metaDB.GetInt64(decimalsKey)
 	if err == nil {
 		et.decimals = int(decimals)

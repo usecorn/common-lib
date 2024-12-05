@@ -10,6 +10,11 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 )
 
+const (
+	EthereumNetwork = "ethereum"
+	CornMainnet     = "corn-mainnet"
+)
+
 type EthClient interface {
 	BlockNumber(ctx context.Context) (uint64, error)
 	BlockByNumber(ctx context.Context, number *big.Int) (*types.Block, error)
