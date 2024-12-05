@@ -36,6 +36,7 @@ type ERC20 interface {
 	TransferEvents(ctx context.Context, start, end uint64) ([]ERC20Transfer, error)
 	BalanceOf(ctx context.Context, addr common.Address) (*big.Int, error)
 	Decimals(ctx context.Context) (int, error)
+	TotalSupply(ctx context.Context) (*big.Int, error)
 }
 
 func NewERC20(log logrus.Ext1FieldLogger, metaDB E20Cache, ethClient *ethclient.Client, addr common.Address, network string) (ERC20, error) {
@@ -134,4 +135,8 @@ func (et *erc20) Decimals(ctx context.Context) (int, error) {
 		return 0, errors.Wrapf(err, "failed to set decimals for %s", et.token)
 	}
 	return int(val), nil
+}
+
+func (et *erc20) TotalSupply(ctx context.Context) (*big.Int, error) {
+	return et.erc20.TotalSupply(&bind.CallOpts{Context: ctx})
 }
