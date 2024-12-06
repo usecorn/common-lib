@@ -54,7 +54,7 @@ func MustNumericToInt(n pgtype.Numeric) *big.Int {
 
 func FloatToNumeric(f *big.Float) (pgtype.Numeric, error) {
 	n := &pgtype.Numeric{}
-	err := n.Set(f.String())
+	err := n.Set(f.Text('f', -1))
 	return *n, err
 }
 
