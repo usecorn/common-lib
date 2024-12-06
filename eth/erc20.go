@@ -97,7 +97,7 @@ func (et *erc20) fillTimestamps(ctx context.Context, events []ERC20Transfer) err
 	for blockNum := range blockTimestamps {
 		block, err := et.ethClient.BlockByNumber(ctx, new(big.Int).SetUint64(blockNum))
 		if err != nil {
-			return errors.Wrap(err, "failed to get block by number")
+			return errors.Wrapf(err, "failed to get block %d by number", blockNum)
 		}
 		blockTimestamps[blockNum] = block.Time()
 	}
