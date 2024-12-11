@@ -19,3 +19,15 @@ func MustTimeToTimestamp(t time.Time) pgtype.Timestamp {
 	}
 	return out
 }
+
+func UnixToTimestamp(unix int64) (pgtype.Timestamp, error) {
+	return TimeToTimestamp(time.Unix(unix, 0))
+}
+
+func MustUnixToTimestamp(unix int64) pgtype.Timestamp {
+	out, err := UnixToTimestamp(unix)
+	if err != nil {
+		panic(err)
+	}
+	return out
+}
