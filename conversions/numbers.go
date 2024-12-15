@@ -67,7 +67,12 @@ func MustFloatToNumeric(f *big.Float) pgtype.Numeric {
 }
 
 func RatToNumeric(r *big.Rat) (pgtype.Numeric, error) {
-	return FloatToNumeric(big.NewFloat(0).SetRat(r))
+	n := &pgtype.Numeric{}
+	err := n.Set(r.FloatString(20))
+	if err != nil {
+		return pgtype.Numeric{}, err
+	}
+	return *n, err
 }
 
 func IntToNumeric(i *big.Int) (pgtype.Numeric, error) {
