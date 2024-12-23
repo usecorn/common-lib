@@ -97,9 +97,6 @@ func (e EarnRequestFullBatch) Validate() error {
 	if len(e.UserAddrs) != len(e.EarnRates) {
 		return errors.New("userAddrs and earnRates must be the same length")
 	}
-	if len(e.SourceUsers) != 0 {
-		return errors.New("sourceUsers must be empty")
-	}
 
 	for _, userAddr := range e.UserAddrs {
 		_, err := validate.GetValidEthAddr(userAddr)
