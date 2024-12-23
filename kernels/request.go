@@ -23,7 +23,7 @@ type EarnRequest struct {
 
 func (er EarnRequest) Clone() EarnRequest {
 	var out EarnRequest
-	err := copier.Copy(&out, &er)
+	err := copier.CopyWithOption(&out, &er, copier.Option{DeepCopy: true})
 	if err != nil {
 		panic(err)
 	}

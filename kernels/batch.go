@@ -31,7 +31,7 @@ func (e EarnRequestFullBatch) Size() int {
 
 func (e EarnRequestFullBatch) Clone() EarnRequestFullBatch {
 	var out EarnRequestFullBatch
-	err := copier.Copy(&out, &e)
+	err := copier.CopyWithOption(&out, &e, copier.Option{DeepCopy: true})
 	if err != nil {
 		panic(err)
 	}
@@ -42,8 +42,13 @@ func (e EarnRequestFullBatch) WithReferralBonuses(referralChains [][]string, tie
 
 	out := e.Clone()
 
-	if len(out.SourceUsers) == 0 {
-		return EarnRequestFullBatch{}, errors.New("sourceUsers must not be empty")
+	if e.StartBlocks == nil {
+		out.StartBlocks = nil
+	}
+
+	if len(out.SourceUsers) == 0 { // If the sourceUsers are empty, we just fill with the userAddrs
+		out.SourceUsers = make([]string, len(out.UserAddrs))
+		copy(out.SourceUsers, out.UserAddrs)
 	}
 
 	for i := range referralChains {
@@ -250,7 +255,7 @@ func (e EarnRequestBatch) Validate() error {
 
 func (er EarnRequestBatch) Clone() EarnRequestBatch {
 	var out EarnRequestBatch
-	err := copier.Copy(&out, &er)
+	err := copier.CopyWithOption(&out, &er, copier.Option{DeepCopy: true})
 	if err != nil {
 		panic(err)
 	}
@@ -271,12 +276,20 @@ func (e EarnRequestBatch) WithReferralBonuses(referralChains [][]string, tierEar
 
 	copy(out.UserAddrs, e.UserAddrs)
 	copy(out.EarnRates, e.EarnRates)
-	copy(out.SourceUsers, e.UserAddrs)
+	// If the sourceUsers are empty, we just fill with the userAddrs
+	if len(e.SourceUsers) == 0 {
+		copy(out.SourceUsers, e.UserAddrs)
+	} else { // Otherwise we copy the sourceUsers
+		copy(out.SourceUsers, e.SourceUsers)
+	}
 
 	for i := range referralChains {
 		earnRate, ok := conversions.NewLargeFloat().SetString(e.EarnRates[i])
 		if !ok {
 			return EarnRequestBatch{}, errors.New("invalid earn rate")
+		}
+		if out.SourceUsers[i] != out.UserAddrs[i] || len(referralChains[i]) == 0 {
+			continue // If the sourceUser is not the same, this is a special case, and hence does not get its referral bonus
 		}
 		for j := range referralChains[i] {
 			earnRateTier := big.NewFloat(0).SetRat(tierEarnRates[j])
