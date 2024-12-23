@@ -33,6 +33,10 @@ func (er EarnRequest) Clone() EarnRequest {
 func (e EarnRequest) ReferralBonuses(referralChain []string, tierEarnRates map[int]*big.Rat) ([]EarnRequest, error) {
 	var out []EarnRequest
 
+	if e.SourceUser == "" || e.SourceUser == e.UserAddr || len(referralChain) == 0 {
+		return nil, nil
+	}
+
 	for i := range referralChain {
 		req := EarnRequest{
 			UserAddr:   referralChain[i],
@@ -42,7 +46,7 @@ func (e EarnRequest) ReferralBonuses(referralChain []string, tierEarnRates map[i
 			StartBlock: e.StartBlock,
 			StartTime:  e.StartTime,
 		}
-		earnRate, ok := big.NewFloat(0).SetString(e.EarnRate)
+		earnRate, ok := conversions.NewLargeFloat().SetString(e.EarnRate)
 		if !ok {
 			return nil, errors.New("invalid earn rate")
 		}
