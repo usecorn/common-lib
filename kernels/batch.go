@@ -15,7 +15,7 @@ type EarnRequestFullBatch struct {
 	UserAddrs   []string `json:"userAddrs"`
 	Sources     []string `json:"sources"`
 	SubSources  []string `json:"subSources"`
-	SourceUsers []string `json:"-"`
+	SourceUsers []string `json:"sourceUsers"`
 	StartBlocks []int64  `json:"startBlocks"`
 	StartTimes  []int64  `json:"startTimes"`
 	EarnRates   []string `json:"earnRates"`
@@ -42,15 +42,20 @@ func (e EarnRequestFullBatch) WithReferralBonuses(referralChains [][]string, tie
 
 	out := e.Clone()
 
-	out.SourceUsers = make([]string, len(e.UserAddrs))
-	copy(out.SourceUsers, e.UserAddrs)
+	if len(out.SourceUsers) == 0 {
+		return EarnRequestFullBatch{}, errors.New("sourceUsers must not be empty")
+	}
 
 	for i := range referralChains {
 		earnRate, ok := conversions.NewLargeFloat().SetString(e.EarnRates[i])
 		if !ok {
 			return EarnRequestFullBatch{}, errors.New("invalid earn rate")
 		}
+		if out.SourceUsers[i] != out.UserAddrs[i] || len(referralChains[i]) == 0 {
+			continue
+		}
 		for j := range referralChains[i] {
+
 			out.UserAddrs = append(out.UserAddrs, referralChains[i][j])
 			out.Sources = append(out.Sources, out.Sources[i])
 			out.SubSources = append(out.SubSources, out.SubSources[i])
@@ -179,7 +184,7 @@ type EarnRequestBatch struct {
 	UserAddrs   []string `json:"userAddrs"`
 	Source      string   `json:"source"`
 	SubSource   string   `json:"subSource"`
-	SourceUsers []string `json:"-"`
+	SourceUsers []string `json:"sourceUsers"`
 	StartBlock  int64    `json:"startBlock"`
 	StartTime   int64    `json:"startTime"`
 	EarnRates   []string `json:"earnRates"`
