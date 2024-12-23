@@ -15,7 +15,7 @@ type EarnRequest struct {
 	UserAddr   string `json:"userAddr"`
 	Source     string `json:"source"`
 	SubSource  string `json:"subSource"`
-	SourceUser string `json:"-"`
+	SourceUser string `json:"sourceUser"`
 	StartBlock int64  `json:"startBlock"`
 	StartTime  int64  `json:"startTime"`
 	EarnRate   string `json:"earnRate"`
