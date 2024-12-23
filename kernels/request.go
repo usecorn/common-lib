@@ -33,7 +33,7 @@ func (er EarnRequest) Clone() EarnRequest {
 func (e EarnRequest) ReferralBonuses(referralChain []string, tierEarnRates map[int]*big.Rat) ([]EarnRequest, error) {
 	var out []EarnRequest
 
-	if e.SourceUser == "" || e.SourceUser == e.UserAddr || len(referralChain) == 0 {
+	if e.GetSourceUser() != e.UserAddr || len(referralChain) == 0 {
 		return nil, nil
 	}
 

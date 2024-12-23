@@ -189,14 +189,6 @@ func Test_EarnRequest_GetSourceUser(t *testing.T) {
 
 func Test_EarnRequest_ReferralBonuses(t *testing.T) {
 	t.Parallel()
-	rq := EarnRequest{
-		UserAddr:   testutils.GenRandEVMAddr(),
-		Source:     "source",
-		StartBlock: 1,
-		StartTime:  0,
-		EarnRate:   "100",
-	}
-
 	tierRates := map[int]*big.Rat{
 		0: big.NewRat(1, 10),
 		1: big.NewRat(1, 20),
@@ -204,22 +196,46 @@ func Test_EarnRequest_ReferralBonuses(t *testing.T) {
 		3: big.NewRat(1, 40),
 	}
 
-	referralChain := []string{testutils.GenRandEVMAddr(), testutils.GenRandEVMAddr()}
+	t.Run("happy path", func(t *testing.T) {
+		rq := EarnRequest{
+			UserAddr:   testutils.GenRandEVMAddr(),
+			Source:     "source",
+			StartBlock: 1,
+			StartTime:  0,
+			EarnRate:   "100",
+		}
 
-	bonuses, err := rq.ReferralBonuses(referralChain, tierRates)
-	require.NoError(t, err)
+		referralChain := []string{testutils.GenRandEVMAddr(), testutils.GenRandEVMAddr()}
 
-	require.Len(t, bonuses, 2)
+		bonuses, err := rq.ReferralBonuses(referralChain, tierRates)
+		require.NoError(t, err)
 
-	for i := range bonuses {
-		require.Equal(t, referralChain[i], bonuses[i].UserAddr)
-		require.Equal(t, rq.GetSourceUser(), bonuses[i].SourceUser)
-		require.Equal(t, rq.StartBlock, bonuses[i].StartBlock)
-		require.Equal(t, rq.StartTime, bonuses[i].StartTime)
-	}
+		require.Len(t, bonuses, 2)
 
-	require.EqualValues(t, fmt.Sprintf("%d", int(100*1/tierRates[0].Denom().Int64())), bonuses[0].EarnRate)
-	require.EqualValues(t, fmt.Sprintf("%d", int(100*1/tierRates[1].Denom().Int64())), bonuses[1].EarnRate)
+		for i := range bonuses {
+			require.Equal(t, referralChain[i], bonuses[i].UserAddr)
+			require.Equal(t, rq.GetSourceUser(), bonuses[i].SourceUser)
+			require.Equal(t, rq.StartBlock, bonuses[i].StartBlock)
+			require.Equal(t, rq.StartTime, bonuses[i].StartTime)
+		}
+
+		require.EqualValues(t, fmt.Sprintf("%d", int(100*1/tierRates[0].Denom().Int64())), bonuses[0].EarnRate)
+		require.EqualValues(t, fmt.Sprintf("%d", int(100*1/tierRates[1].Denom().Int64())), bonuses[1].EarnRate)
+	})
+
+	t.Run("source user set", func(t *testing.T) {
+		req := EarnRequest{
+			EarnRate:   "100",
+			UserAddr:   testutils.GenRandEVMAddr(),
+			SourceUser: testutils.GenRandEVMAddr(),
+			Source:     "ohio",
+			SubSource:  "corn",
+		}
+
+		res, err := req.ReferralBonuses([]string{testutils.GenRandEVMAddr(), testutils.GenRandEVMAddr()}, tierRates)
+		require.NoError(t, err)
+		require.Nil(t, res)
+	})
 
 }
 
