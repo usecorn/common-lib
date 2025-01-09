@@ -4,7 +4,7 @@ import "github.com/cockroachdb/errors"
 
 func ParseWitnessSignatureBIP322(sigBytes []byte) ([][]byte, error) {
 	if len(sigBytes) < 66 {
-		return nil, errors.Errorf("signature length (%d) is invalid, must be atleast 66 bytes", len(sigBytes))
+		return nil, errors.Errorf("signature length (%d) is invalid, must be at least 66 bytes", len(sigBytes))
 	}
 
 	// Extract the number of signatures and the size of each signature
