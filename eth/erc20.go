@@ -16,7 +16,7 @@ import (
 )
 
 type E20Cache interface {
-	Set(key string, val interface{}) error
+	Set(key string, val any) error
 	GetString(key string) (out string, err error)
 	GetInt64(key string) (int64, error)
 	GetUint64(key string) (uint64, error)

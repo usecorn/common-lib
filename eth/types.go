@@ -15,6 +15,11 @@ const (
 	CornMainnet     = "corn-mainnet"
 )
 
+const (
+	EthereumChainID    = 1
+	CornMainnetChainID = 21000000
+)
+
 type EthClient interface {
 	BlockNumber(ctx context.Context) (uint64, error)
 	BlockByNumber(ctx context.Context, number *big.Int) (*types.Block, error)
