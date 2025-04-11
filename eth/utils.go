@@ -4,9 +4,10 @@ import (
 	"context"
 	"math/big"
 
+	"github.com/cockroachdb/errors"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/pkg/errors"
+
 	"github.com/usecorn/common-lib/app"
 	"github.com/usecorn/common-lib/server/config"
 )
