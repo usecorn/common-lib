@@ -2,7 +2,9 @@ package eth
 
 import (
 	"context"
+	"encoding/hex"
 	"math/big"
+	"strings"
 
 	"github.com/cockroachdb/errors"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -59,4 +61,20 @@ func GetHeaderByNumberRetry(ctx context.Context, network string, conf *config.Ch
 		}
 	}
 	return nil, errors.Errorf("failed to get block %d", blockNo)
+}
+
+func HexToByte32(hexString string) ([32]byte, error) {
+	b, err := hex.DecodeString(strings.TrimLeft(hexString, "0x"))
+	if err != nil {
+		panic(err)
+	}
+	var out [32]byte
+	if len(b) > 32 {
+		return out, errors.Errorf("input hex string is too long: %d", len(b))
+	}
+	if len(b) < 32 {
+		b = append(b, make([]byte, 32-len(b))...)
+	}
+	copy(out[:], b)
+	return out, nil
 }
