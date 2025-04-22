@@ -1,6 +1,7 @@
 package dbutils
 
 import (
+	"context"
 	"strconv"
 
 	"github.com/cockroachdb/errors"
@@ -8,10 +9,10 @@ import (
 )
 
 type MetaDB interface {
-	Set(key string, val any) error
-	GetString(key string) (out string, err error)
-	GetInt64(key string) (int64, error)
-	GetUint64(key string) (uint64, error)
+	Set(ctx context.Context, key string, val any) error
+	GetString(ctx context.Context, key string) (out string, err error)
+	GetInt64(ctx context.Context, key string) (int64, error)
+	GetUint64(ctx context.Context, key string) (uint64, error)
 }
 
 type metaDB struct {
@@ -37,17 +38,17 @@ func NewMetaDB(sdb *sqlx.DB) (MetaDB, error) {
 	}, nil
 }
 
-func (meta *metaDB) Set(key string, val any) error {
+func (meta *metaDB) Set(ctx context.Context, key string, val any) error {
 	var err error
 	switch v := val.(type) {
 	case string:
-		_, err = meta.setMeta.Exec(key, v)
+		_, err = meta.setMeta.ExecContext(ctx, key, v)
 	case int:
-		_, err = meta.setMeta.Exec(key, strconv.Itoa(v))
+		_, err = meta.setMeta.ExecContext(ctx, key, strconv.Itoa(v))
 	case int64:
-		_, err = meta.setMeta.Exec(key, strconv.FormatInt(v, 10))
+		_, err = meta.setMeta.ExecContext(ctx, key, strconv.FormatInt(v, 10))
 	case uint64:
-		_, err = meta.setMeta.Exec(key, strconv.FormatUint(v, 10))
+		_, err = meta.setMeta.ExecContext(ctx, key, strconv.FormatUint(v, 10))
 	default:
 		err = errors.New("unsupported type")
 	}
@@ -55,20 +56,20 @@ func (meta *metaDB) Set(key string, val any) error {
 	return err
 }
 
-func (meta *metaDB) GetString(key string) (out string, err error) {
-	return out, meta.getMeta.Get(&out, key)
+func (meta *metaDB) GetString(ctx context.Context, key string) (out string, err error) {
+	return out, meta.getMeta.GetContext(ctx, &out, key)
 }
 
-func (meta *metaDB) GetInt64(key string) (int64, error) {
-	rawVal, err := meta.GetString(key)
+func (meta *metaDB) GetInt64(ctx context.Context, key string) (int64, error) {
+	rawVal, err := meta.GetString(ctx, key)
 	if err != nil {
 		return -1, err
 	}
 	return strconv.ParseInt(rawVal, 10, 64)
 }
 
-func (meta *metaDB) GetUint64(key string) (uint64, error) {
-	rawVal, err := meta.GetString(key)
+func (meta *metaDB) GetUint64(ctx context.Context, key string) (uint64, error) {
+	rawVal, err := meta.GetString(ctx, key)
 	if err != nil {
 		return 0, err
 	}
