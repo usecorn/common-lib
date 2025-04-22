@@ -12,15 +12,11 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/sirupsen/logrus"
 
+	"github.com/usecorn/common-lib/dbutils"
 	"github.com/usecorn/common-lib/eth/contracts"
 )
 
-type E20Cache interface {
-	Set(key string, val any) error
-	GetString(key string) (out string, err error)
-	GetInt64(key string) (int64, error)
-	GetUint64(key string) (uint64, error)
-}
+type E20Cache dbutils.MetaDB
 
 type erc20 struct {
 	log       logrus.Ext1FieldLogger
@@ -120,7 +116,7 @@ func (et *erc20) Decimals(ctx context.Context) (int, error) {
 		decimalsKey = "erc20::" + et.network + "::" + et.token + "::decimals"
 	}
 
-	decimals, err := et.metaDB.GetInt64(decimalsKey)
+	decimals, err := et.metaDB.GetInt64(ctx, decimalsKey)
 	if err == nil {
 		et.decimals = int(decimals)
 		return et.decimals, nil
@@ -130,7 +126,7 @@ func (et *erc20) Decimals(ctx context.Context) (int, error) {
 	if err != nil {
 		return 0, errors.Wrapf(err, "failed to get decimals for %s", et.token)
 	}
-	err = et.metaDB.Set(decimalsKey, int64(val))
+	err = et.metaDB.Set(ctx, decimalsKey, int64(val))
 	if err != nil {
 		return 0, errors.Wrapf(err, "failed to set decimals for %s", et.token)
 	}
