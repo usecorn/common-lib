@@ -22,12 +22,12 @@ func RecoverPublicKey(message string, signatureDecoded []byte) (*secp2561k1.Publ
 
 	// Ensure signature has proper recovery flag
 	recoveryFlag := int(signatureDecoded[0])
-	if !lo.Contains[int](AllFlags(), recoveryFlag) {
+	if !lo.Contains(AllFlags(), recoveryFlag) {
 		return nil, errors.Errorf("invalid recovery flag: %d", recoveryFlag)
 	}
 
 	// Reset recovery flag after obtaining keyID for Trezor
-	if lo.Contains[int](TrezorFlags(), recoveryFlag) {
+	if lo.Contains(TrezorFlags(), recoveryFlag) {
 		signatureDecoded[0] = byte(27 + GetKeyID(recoveryFlag))
 	}
 

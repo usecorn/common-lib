@@ -14,7 +14,7 @@ func GenRandHex(n int) string {
 // GenMany generates n items using the given function
 func GenMany[T any](n int, fn func() T) []T {
 	out := make([]T, n)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		out[i] = fn()
 	}
 	return out

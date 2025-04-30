@@ -11,9 +11,7 @@ func ToDecimalForm(balance *big.Int, decimals int) *big.Float {
 	pow = pow.Exp(pow, big.NewInt(int64(decimals)), nil)
 
 	normalizedBalance := conversions.NewLargeFloat().SetInt(balance)
-	normalizedBalance = normalizedBalance.Quo(normalizedBalance, conversions.NewLargeFloat().SetInt(pow))
-
-	return normalizedBalance
+	return normalizedBalance.Quo(normalizedBalance, conversions.NewLargeFloat().SetInt(pow))
 }
 
 func FromDecimalForm(balance *big.Float, decimals int) *big.Int {
