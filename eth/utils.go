@@ -78,3 +78,23 @@ func HexToByte32(hexString string) ([32]byte, error) {
 	copy(out[:], b)
 	return out, nil
 }
+
+type BN interface {
+	BlockNumber() int64
+}
+
+func GetBlockToTimestampMap[T BN](ctx context.Context, ethClient EthClient, events []T) (map[int64]int64, error) {
+	blockTimestamps := make(map[int64]int64)
+	for _, event := range events {
+		blockTimestamps[event.BlockNumber()] = 0
+	}
+
+	for blockNum := range blockTimestamps {
+		block, err := ethClient.BlockByNumber(ctx, big.NewInt(blockNum))
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to get block by number")
+		}
+		blockTimestamps[blockNum] = int64(block.Time())
+	}
+	return blockTimestamps, nil
+}
