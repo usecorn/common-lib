@@ -15,7 +15,6 @@ require (
 	github.com/gin-gonic/gin v1.10.1
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgtype v1.14.4
-	github.com/jinzhu/copier v0.4.0
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/numbergroup/cleanenv v1.7.1
 	github.com/numbergroup/gin-metrics v0.2.4
