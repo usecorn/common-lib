@@ -118,6 +118,9 @@ func (et *erc20) Decimals(ctx context.Context) (int, error) {
 
 	decimals, err := et.metaDB.GetInt64(ctx, decimalsKey)
 	if err == nil {
+		if decimals < math.MinInt || decimals > math.MaxInt {
+			return 0, errors.Errorf("value out of range for int: %d", decimals)
+		}
 		et.decimals = int(decimals)
 		return et.decimals, nil
 	}
