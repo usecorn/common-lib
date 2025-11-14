@@ -1,6 +1,7 @@
 package config
 
 import (
+	// TODO Check for replacement / forking for code independence
 	joonix "github.com/numbergroup/log"
 	"github.com/sirupsen/logrus"
 )
